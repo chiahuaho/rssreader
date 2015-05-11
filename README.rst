@@ -32,28 +32,22 @@ Required Libraries
 Usage
 =====
 
-- Add an RSS:
-
+- Add an RSS::
   $> rssreader add https://github.com/ho-chiahua.atom
 
-- Show all feeds:
-
+- Show all feeds::
   $> rssreader ls
 
-- Show new feeds:
-
+- Show new feeds::
   $> rssreader ls -n
 
-- Read the details of a feed:
-
+- Read the details of a feed::
   $> rssreader read tag:github.com,2008:CreateEvent/2790427132
 
-- Recommend new feeds:
-
+- Recommend new feeds::
   $> rssreader ls -n -r
 
-- More usages for ls
-
+- More usages for ls::
   $> rssreader ls -h
 
 
@@ -71,8 +65,7 @@ Console
 
 *rssconsole* is a simple console to use rssreader. After running the console, 
 users do not need to type the program name (i.e., "rssreader"). For example, 
-users can directly type "ls" to list feeds.
-
-$> rssconsole
-rssconsole>> add  https://github.com/ho-chiahua.atom
-rssconsole>> ls -l 5
+users can directly type "ls" to list feeds::
+        $> rssconsole
+        rssconsole>> add  https://github.com/ho-chiahua.atom
+        rssconsole>> ls -l 5
