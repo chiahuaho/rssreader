@@ -44,7 +44,7 @@ def rssreader(prog, argv):
 	elif argv[0] == 'add':
 		parser = argparse.ArgumentParser(description='Add a new RSS URL.', prog=prog+' add')
 		parser.add_argument('url', metavar='URL', type=str,
-				help='URLs to add.')
+				help='RSS URL to add.')
 		parser.add_argument('-a', metavar='ALIAS', type=lambda s: unicode(s, 'UTF-8'), help='alias of the URL')
 		args = parser.parse_args(argv[1:])
 		core.set_url(args.url, args.a)
@@ -70,6 +70,10 @@ def rssreader(prog, argv):
 		args = parser.parse_args(argv[1:])
 		urls = core.get_urls()
 		urls = dict(zip([url['url'] for url in urls], urls))
+		if len(urls) == 0:
+			die_with_messages('''you have not added any RSS. Use ``{0} add URL'' to add new RSS.'''.format(prog), help=False)
+
+		
 		items = core.get_items(args.a)
 
 		if args.r:

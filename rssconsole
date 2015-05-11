@@ -18,5 +18,5 @@ EOF
 while echo -n "$PROMPT " && read line; do
 	if [ "$line" == "" ]; then continue; fi
 	if [ "$line" == "bye" ] || [ "$line" == "exit" ] || [ "$line" == "quit" ]; then exit; fi
-	./rssreader $line
+	rssreader $line
 done
