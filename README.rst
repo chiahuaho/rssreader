@@ -33,21 +33,27 @@ Usage
 =====
 
 - Add an RSS::
+  
   $> rssreader add https://github.com/ho-chiahua.atom
 
 - Show all feeds::
+  
   $> rssreader ls
 
 - Show new feeds::
+  
   $> rssreader ls -n
 
 - Read the details of a feed::
+  
   $> rssreader read tag:github.com,2008:CreateEvent/2790427132
 
 - Recommend new feeds::
+  
   $> rssreader ls -n -r
 
 - More usages for ls::
+  
   $> rssreader ls -h
 
 
