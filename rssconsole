@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+PATH=$PATH:.
+PROMPT="rssreader>>" 
+
+cat <<EOF
+
+RSS READER
+
+Type \`\`help'' to read the help message.
+For example: "$PROMPT ls -l" lists five RSS feeds.
+
+Type \`\`exit'' to exit.
+
+EOF
+
+
+while echo -n "$PROMPT " && read line; do
+	if [ "$line" == "" ]; then continue; fi
+	if [ "$line" == "bye" ] || [ "$line" == "exit" ] || [ "$line" == "quit" ]; then exit; fi
+	./rssreader $line
+done

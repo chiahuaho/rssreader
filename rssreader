@@ -1,0 +1,139 @@
+#!/usr/bin/env python
+
+import sys
+import rssreadercore
+import argparse
+import nltk
+import time
+import urllib2
+
+def die_with_messages(error = None, help=True):
+	if error is not None:
+		sys.stderr.write('Error: {0}\n'.format(error))
+
+	if help:
+		sys.stderr.write('''
+usage: {0} COMMAND
+
+COMMAND:
+	add	Add a new RSS URL.
+	ls_urls	List rss URLs.
+	ls	List rss subjects.
+	read	Read the details of an RSS item.
+	help	Show this message.
+
+Use ``{0} COMMAND -h'' for more details.
+		\n'''.format(sys.argv[0]))
+
+	sys.exit(1)
+
+
+def format_date(date):
+	return '{0:04d}/{1:02d}/{2:02d} {3:02d}:{4:02d}:{5:02d}'.format(*time.localtime(date)[:6])
+
+
+def rssreader(prog, argv):
+	if len(argv) <= 0:
+		die_with_messages()
+
+	core = rssreadercore.RssReaderCore()
+	if argv[0] == 'help':
+		die_with_messages()
+
+
+	elif argv[0] == 'add':
+		parser = argparse.ArgumentParser(description='Add a new RSS URL.', prog=prog+' add')
+		parser.add_argument('url', metavar='URL', type=str,
+				help='URLs to add.')
+		parser.add_argument('-a', metavar='ALIAS', type=lambda s: unicode(s, 'UTF-8'), help='alias of the URL')
+		args = parser.parse_args(argv[1:])
+		core.set_url(args.url, args.a)
+	
+
+	elif argv[0] == 'ls_urls':
+		parser = argparse.ArgumentParser(description='List all RSS URLs.', prog=prog+' ls_urls')
+		args = parser.parse_args(argv[1:])
+		urls = core.get_urls()
+
+		for i, cols in enumerate(urls, 1):
+			print(u'''{num}: {alias}\nTitle: {title}\nDescription: {description}\nURL: {url}\n'''.format(num = i, **cols))
+
+
+	elif argv[0] == 'ls':
+		parser = argparse.ArgumentParser(description='List all RSS items.', prog=prog+' ls')
+		parser.add_argument('-a', metavar='ALIAS', nargs='+', type=lambda s: unicode(s, 'UTF-8'), help='aliases of RSS urls. All urls will be checked if not given.')
+		parser.add_argument('-n', action='store_const', const=True, default=False, help='only show new posts.')
+		parser.add_argument('-r', action='store_const', const=True, default=False, help='automatically recommend new posts.')
+		parser.add_argument('-l', default=10, metavar='LIMIT', type=int, help='mximum number of results. No limit if LIMIT < 0. Default: 10.')
+		parser.add_argument('-v', default=0, metavar='VIEW', type=int, help='only show posts which has been viewed >= VIEW times.')
+
+		args = parser.parse_args(argv[1:])
+		urls = core.get_urls()
+		urls = dict(zip([url['url'] for url in urls], urls))
+		items = core.get_items(args.a)
+
+		if args.r:
+			items = core.get_best_n(items, -1)
+		else:
+			items.sort(key=lambda x: x['date'], reverse=True)
+
+		if args.n:
+			items = filter(lambda x: x['read_count'] == 0, items)
+		else:
+			items = filter(lambda x: x['read_count'] >= args.v, items)
+
+		items = filter(lambda x: x['deleted'] == 0, items)
+
+		for i, cols in enumerate(items, 1):
+			if args.l >= 0 and i > args.l: break
+			print(u'''{new} {num} ( ID: {item[guid]} )\n  RSS: {urls[alias]}\n  Title: {item[title]}\n  Date: {date}\n  '''.format(
+				num=i, 
+				date=format_date(cols['date']),
+				item=cols, 
+				urls=urls[cols['rss_url']], 
+				new=('N' if cols['read_count'] == 0 else '-')
+			))
+
+
+	
+	elif argv[0] == 'read':
+		parser = argparse.ArgumentParser(description='Read an RSS post.', prog=prog+' read')
+		parser.add_argument('guid', metavar='GUID', type=str,
+				help='post ID')
+		parser.add_argument('-l', action='store_const', const=True, 
+				default=False, help='list the contents (if a link is provided in the feed).')
+		args = parser.parse_args(argv[1:])
+		
+		item = core.get_item(args.guid)
+		if item is None:
+			die_with_messages('not found: ' + args.guid, help=False)
+	
+		date = format_date(item['date'])
+		print(u'''Title: {item[title]}\nDate: {date}\nLink: {item[link]}\n\nDescription:\n{description}'''.format(
+			item=item, 
+			date=date,
+			description=nltk.clean_html(item['description'])))
+
+		if args.l and item['link']: 
+			url_file = urllib2.urlopen(item['link'])
+			url_data = url_file.read()
+			url_file.close()
+			contents = nltk.clean_html(url_data)
+			print('''\nContents:''')
+			print(contents)
+
+
+	elif argv[0] == 'rm':
+		parser = argparse.ArgumentParser(description='Delete an RSS post.', prog=prog+' rm')
+		parser.add_argument('guid', metavar='GUID', type=str,
+				help='post ID')
+		args = parser.parse_args(argv[1:])		
+		core.remove_item(args.guid)
+
+
+	else:
+		die_with_messages('invalid command ' + argv[0])
+
+
+if __name__ == '__main__':
+	rssreader(sys.argv[0], sys.argv[1:])
