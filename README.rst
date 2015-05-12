@@ -1,15 +1,15 @@
 Introduction
 ============
 
-*rssreader* is a small project with the most basic utilities to read the RSS 
+*RSSREADER* is a small project with the most basic utilities to read the RSS 
 feeds in a text-based environment.
 
 This project is also an experimental environment for studying bandit problems
 and recommender systems.
 
 
-Install
-=======
+Installation
+============
 
 Please add the directory of rssreader and rssconsole to the system path, and put
 rssreadercore.py to the Python path. Alternatively, please run ./rssreader in 

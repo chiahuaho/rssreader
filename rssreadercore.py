@@ -432,6 +432,7 @@ class RssReaderCore:
 
 	def get_best_n(self, items, n):
 		n = min(n, len(items))
+		if n < 0: n = len(items)
 	
 		scores = self.recommender.get_scores(items)
 		
