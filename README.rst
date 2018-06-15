@@ -34,7 +34,7 @@ Usage
 
 - Add an RSS::
   
-  $> rssreader add https://github.com/ho-chiahua.atom
+  $> rssreader add https://github.com/chiahuaho.atom
 
 - Show all feeds::
   
@@ -73,5 +73,5 @@ Console
 users do not need to type the program name (i.e., "rssreader"). For example, 
 users can directly type "ls" to list feeds::
         $> rssconsole
-        rssconsole>> add  https://github.com/ho-chiahua.atom
+        rssconsole>> add  https://github.com/chiahuaho.atom
         rssconsole>> ls -l 5
